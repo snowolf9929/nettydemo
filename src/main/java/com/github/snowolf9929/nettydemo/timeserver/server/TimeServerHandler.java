@@ -11,23 +11,31 @@ import java.util.Date;
  * Created by youki on 14-10-4.
  */
 public class TimeServerHandler extends ChannelHandlerAdapter {
+    private int counter = 0;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        //利用了StringDecoder，msg可以直接转成String对象
+        /*
         ByteBuf buf = (ByteBuf) msg;
         byte[] req = new byte[buf.readableBytes()];
         buf.readBytes(req);
         String body = new String(req, "UTF-8");
-        System.out.println("The time server receive order : " + body);
+        */
+        String body = (String) msg;
+        System.out.println("The time server receive order : " + body + " ; the counter is : " + ++counter);
         String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? new Date(System.currentTimeMillis()).toString() : "BAD ORDER";
+        currentTime = currentTime + System.getProperty("line.separator");
         ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
-        ctx.write(resp);
+        ctx.writeAndFlush(resp);
     }
 
+    /*
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
     }
+    */
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

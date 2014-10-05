@@ -8,6 +8,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 
 
 /**
@@ -41,6 +43,9 @@ public class TimeServer {
 
         @Override
         protected void initChannel(SocketChannel socketChannel) throws Exception {
+            //下面两行是利用LineBasedFrameDecode解决TCP粘包问题，如果想演示粘包问题，可注释下面两行
+            socketChannel.pipeline().addLast(new LineBasedFrameDecoder(1024));
+            socketChannel.pipeline().addLast(new StringDecoder());
             socketChannel.pipeline().addLast(new TimeServerHandler());
         }
     }
